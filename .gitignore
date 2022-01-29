@@ -3,18 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-personal/ig_access_token.txt
-personal/creds.json
-instantclient/
-comment_log.json
-deleted_comment.json
-ig_access_token.txt
-
-working_files/
-adhoc/hinted/
-secrets/
-*.pickle
-
 # C extensions
 *.so
 

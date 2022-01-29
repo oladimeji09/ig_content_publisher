@@ -5,6 +5,7 @@ import requests as r, json,time,json,ig_tags,python_helper as ph
 from instagrapi import Client
 cl = Client()
 baseurl = 'https://graph.facebook.com/v11.0/'
+ig_users = json.load(open(ph.root_fp+'/creds/creds.json')).get('ig_users')
 ig_creds = json.load(open(ph.root_fp+'/creds/creds.json')).get('instagram')
 user_token = open(ph.root_fp+"/creds/ig_access_token.txt", "r").read()
 
@@ -174,9 +175,12 @@ def delete_media(username,password,N=5):
             continue
     logout()
 
-def follower_user(user_id):
+def follower_user(user_id, follow ='Y'):
     """Follow a users"""
-    return cl.user_follow(user_id)
+    return cl.user_follow(user_id) if follow == 'Y' else cl.user_unfollow(user_id)
+
+def user_info_by_urs(username):
+    return cl.user_info_by_username(username)
 
 def follow_and_comment(username, password,tags, comment, num_media,follow = 'Y'):
     """Follow accounts with media in hashtags and write comment"""
