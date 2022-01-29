@@ -53,7 +53,7 @@ def wrap_text(sentence):
     new_text += "\n" + new_sentence
     return new_text
 
-def add_text(img, sentence, font_size, font_name=''):
+def add_text(img, sentence, font_size=15, font_name=''):
     """Add centered text to image"""
     draw = ImageDraw.Draw(img)
     img_w,img_h = img.size
@@ -65,10 +65,16 @@ def add_text(img, sentence, font_size, font_name=''):
     draw.multiline_text(position, wrap_text(sentence), fill=(255,255,255), font=font)
     return img
 
-def save_upload_img(img, file_name, file_type,upload='Y'):
+def save_upload_img(img, file_name, file_type='png',upload='Y'):
     """Save the final image with the text and define size and files type"""
     img.save(ph.root_fp+'working_files/'+file_name+'.'+file_type,quality=100)
-    print("Saved img {0}.{1} at {2}".format(file_name,file_type,ph.root_fp+'working_files//'))
+    print("Saved img {0}.{1} at {2}".format(file_name,file_type,ph.root_fp+'working_files/'))
     if upload =='Y':
-        con  = img_gur.upload_path(ph.root_fp+'Projects/working_files/'+file_name+'.'+file_type)
+        con  = img_gur.upload_path(ph.root_fp+'working_files/'+'joke'+'.'+file_type)
     return con['link']
+
+def upload_img(sentence,file_name,font_size=15,font_name='',file_type='png',img_path='',size=(1000,1000),colour=random_colour(),upload='Y'):
+    """create a new image, save the image, and upload it to img_gur"""
+    img = create_img(img_path,size,colour)
+    img = add_text(img,sentence,font_size,font_name)
+    return save_upload_img(img,file_name,file_type,upload)
