@@ -186,13 +186,13 @@ def user_network(user_id, flow='following', N=25):
 def user_info_by_urs(username):
     return cl.user_info_by_username(username)
 
-def follow_and_comment(username, password,tags, comment, num_media,follow = 'Y'):
+def follow_and_comment(username, password,tags, comment, num_media, follow = 'Y'):
     """Follow accounts with media in hashtags and write comment"""
     login(username, password)
     medias = get_hashtag_medias_top(tags,num_media)
     for user in medias:
+        comment_on_media([user],  comment)
         if follow == 'Y':
             un_follow_user(user.dict().get('user').get('pk'))
             print('Followed user: '+ user.dict().get('user').get('username'))
-        comment_on_media([user],  comment)
     logout()
