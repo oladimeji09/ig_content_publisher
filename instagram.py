@@ -93,6 +93,7 @@ def get_post_quota(ig_id):
 def login(username, password):
     """login and return cl"""
     cl.login(username, password)
+    time.sleep(30)
     return cl
 
 def logout():
@@ -102,6 +103,7 @@ def get_hashtag_medias_top(tags_list, N=5):
     """Get a list of top medias from hashtags"""
     media_list = []
     for tag in tags_list:
+        time.sleep(30)
         try:
             medias = cl.hashtag_medias_top(tag, amount=N)
             for media in medias:
@@ -114,6 +116,7 @@ def get_user_media(username_list, N=5):
     """Get a list of N Media for usernames"""
     media_list = []
     for username in username_list:
+        time.sleep(30)
         try:
             user_id = cl.user_id_from_username(username)
             medias  = cl.user_medias(user_id, N)
@@ -126,6 +129,7 @@ def get_user_media(username_list, N=5):
 def comment_on_media(media_list:list,comment:str):
     """Comment on media and like the comment & post"""
     for media_id in media_list:
+        time.sleep(30)
         # try:
         media_id = dict(media_id)
         with open('comment_log.json','r') as fp: #todo: find a way to make this file relative
@@ -152,6 +156,7 @@ def delete_comment(media_id, media_comment_id):
     """Delete comment on media"""
     info = dict(cl.media_info(media_id))
     cl.comment_bulk_delete(media_id, [media_comment_id])
+    time.sleep(30)
     with open('deleted_comment.json','a+') as ft: # write the deleted line to file
         json.dump({
             "media_slug" : "www.instagram.com/p/"+info.get('code'),
@@ -169,7 +174,6 @@ def delete_media(username,password,N=5):
     for media in media_list:
         try:
             cl.media_delete(media.dict().get('pk'))
-            time.sleep(30)
             print('Deleted Media on www.instagram.com/p/{}'.format(media.dict().get('code')))
         except:
             continue
@@ -177,13 +181,16 @@ def delete_media(username,password,N=5):
 
 def un_follow_user(user_id, follow ='follow'):
     """Follow or unfollow a user"""
+    time.sleep(30)
     return cl.user_follow(user_id) if follow == 'follow' else cl.user_unfollow(user_id)
 
 def user_network(user_id, flow='following', N=25):
     """Return a list of followers or user following the said user."""
+    time.sleep(30)
     return cl.user_following(user_id, amount = N) if flow == 'following' else cl.user_followers(user_id,amount= N)
 
 def user_info_by_urs(username):
+    time.sleep(30)
     return cl.user_info_by_username(username)
 
 def follow_and_comment(username, password,tags, comment, num_media, follow = 'Y'):
