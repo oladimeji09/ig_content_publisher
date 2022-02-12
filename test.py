@@ -1,7 +1,7 @@
-import instagram
-token = get_token('uk_travel_redlist')
-token = get_token('everyday_joker')
-token = get_token('top_10_billionaires')
+import instagram as ig
+# token = get_token('uk_travel_redlist')
+# token = get_token('everyday_joker')
+token = ig.get_token('top_10_billionaires')
 ig_ig = get_ig_acc(token.get('id')).get('id')
 get_post_quota(ig_ig)
 
