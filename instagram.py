@@ -1,7 +1,9 @@
 # @auto-fold regex \.\
 # NOTE: https://developers.facebook.com/docs/instagram-api docs
 
-import requests as r, json,time,json,ig_tags,python_helper as ph
+import requests as r, json,time,json,ig_tags
+from python_helpers import python_helper as ph
+
 from instagrapi import Client
 cl = Client()
 baseurl = 'https://graph.facebook.com/v11.0/'

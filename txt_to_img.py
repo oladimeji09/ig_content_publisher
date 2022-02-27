@@ -1,7 +1,8 @@
 #@auto-fold regex /./
 #https://muthu.co/instagram-quotes-generator-using-python-pil/
 from PIL import Image, ImageDraw, ImageFont,ImageColor
-import os,random, colourettu as c, img_gur,python_helper as ph
+import os,random, colourettu as c, img_gur
+from python_helpers import python_helper as ph
 
 def random_colour():
     colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
