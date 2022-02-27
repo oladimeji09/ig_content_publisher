@@ -1,7 +1,9 @@
 # @auto-fold regex \.\
 # NOTE: https://developers.facebook.com/docs/instagram-api docs
 
-import requests as r, json,time,json,ig_tags,python_helper as ph
+import requests as r, json,time,json,ig_tags
+from python_helpers import python_helper as ph
+
 from instagrapi import Client
 cl = Client()
 baseurl = 'https://graph.facebook.com/v11.0/'
@@ -12,13 +14,16 @@ user_token = open(ph.root_fp+"/creds/ig_access_token.txt", "r").read()
 def generate_long_token(app_id,app_secret,user_token):
     """Use this to generate Long-Lived User Access Tokens"""
     resp = r.get(baseurl+"""oauth/access_token?grant_type=fb_exchange_token&client_id={0}&client_secret={1}&fb_exchange_token={2}""".format(app_id,app_secret,user_token))
-    with open(ph.root_fp+"/creds/ig_access_token.txt", "w") as f:
-        try:
-            f.write(resp.json()['access_token'])
-        except:
-            f.write(user_token)
-            f.close()
-    return resp.json()['access_token']
+    if resp.status_code == 200:
+        with open(ph.root_fp+"/creds/ig_access_token.txt", "w") as f:
+            try:
+                f.write(resp.json()['access_token'])
+            except:
+                f.write(user_token)
+                f.close()
+        return resp.json()['access_token']
+    else:
+        print("Wrong user token no changes to ig_access_token.txt")
 
 def get_page_tokens(app_id,app_secret,user_token):
     """Use this to retrieve page tokens for all pages in the account"""
@@ -85,14 +90,19 @@ def get_token(user_name):
 
 def get_post_quota(ig_id):
     """Return quota usage for a username"""
-    resp = r.get(baseurl+'{}/content_publishing_limit?fields=quota_usage,rate_limit_settings,config&access_token={}'.format(ig_id,page_access_token))
+    resp = r.get(baseurl+'{}/content_publishing_limit?fields=quota_usage,config&access_token={}'.format(ig_id,page_access_token))
     return resp.json()
-
+# creds = ig_users.get('le_bad_joker')
+# token = get_token('le_bad_joker')
+# ig_id = get_ig_acc(token.get('id')).get('id')
+# get_post_quota(ig_id)
 # All code the line below uses the instagrapi module
 
+#todo:change this to you don't have to log in everyime
 def login(username, password):
     """login and return cl"""
     cl.login(username, password)
+    # time.sleep(30)
     return cl
 
 def logout():
@@ -102,6 +112,7 @@ def get_hashtag_medias_top(tags_list, N=5):
     """Get a list of top medias from hashtags"""
     media_list = []
     for tag in tags_list:
+        time.sleep(10)
         try:
             medias = cl.hashtag_medias_top(tag, amount=N)
             for media in medias:
@@ -114,6 +125,7 @@ def get_user_media(username_list, N=5):
     """Get a list of N Media for usernames"""
     media_list = []
     for username in username_list:
+        time.sleep(10)
         try:
             user_id = cl.user_id_from_username(username)
             medias  = cl.user_medias(user_id, N)
@@ -126,9 +138,10 @@ def get_user_media(username_list, N=5):
 def comment_on_media(media_list:list,comment:str):
     """Comment on media and like the comment & post"""
     for media_id in media_list:
+        time.sleep(10)
         try:
             media_id = dict(media_id)
-            with open('comment_log.json','r') as fp:
+            with open('comment_log.json','r') as fp: #todo: find a way to make this file relative
                 if media_id.get('code') not in fp.read():
                     cl.media_like(media_id.get('pk'))
                     comment_id = dict(cl.media_comment(media_id.get('pk'), comment))
@@ -152,6 +165,7 @@ def delete_comment(media_id, media_comment_id):
     """Delete comment on media"""
     info = dict(cl.media_info(media_id))
     cl.comment_bulk_delete(media_id, [media_comment_id])
+    time.sleep(10)
     with open('deleted_comment.json','a+') as ft: # write the deleted line to file
         json.dump({
             "media_slug" : "www.instagram.com/p/"+info.get('code'),
@@ -169,26 +183,32 @@ def delete_media(username,password,N=5):
     for media in media_list:
         try:
             cl.media_delete(media.dict().get('pk'))
-            time.sleep(30)
             print('Deleted Media on www.instagram.com/p/{}'.format(media.dict().get('code')))
         except:
             continue
     logout()
 
-def follower_user(user_id, follow ='Y'):
-    """Follow a users"""
-    return cl.user_follow(user_id) if follow == 'Y' else cl.user_unfollow(user_id)
+def un_follow_user(user_id, follow ='follow'):
+    """Follow or unfollow a user"""
+    time.sleep(10)
+    return cl.user_follow(user_id) if follow == 'follow' else cl.user_unfollow(user_id)
+
+def user_network(user_id, flow='following', N=25):
+    """Return a list of followers or user following the said user."""
+    time.sleep(10)
+    return cl.user_following(user_id, amount = N) if flow == 'following' else cl.user_followers(user_id,amount= N)
 
 def user_info_by_urs(username):
+    time.sleep(10)
     return cl.user_info_by_username(username)
 
-def follow_and_comment(username, password,tags, comment, num_media,follow = 'Y'):
+def follow_and_comment(username, password,tags, comment, num_media, follow = 'Y'):
     """Follow accounts with media in hashtags and write comment"""
-    login(username, password)
-    medias = get_hashtag_medias_top(tags,num_media)
+    login(ig_users.get('top_10_billionaires').get('user_name'), ig_users.get('top_10_billionaires').get('password'))
+    medias = get_hashtag_medias_top('money',2)
     for user in medias:
-        if follow == 'Y':
-            follower_user(user.dict().get('user').get('pk'))
-            print('Followed user: '+ user.dict().get('user').get('username'))
         comment_on_media([user],  comment)
+        if follow == 'Y':
+            un_follow_user(user.dict().get('user').get('pk'))
+            print('Followed user: '+ user.dict().get('user').get('username'))
     logout()

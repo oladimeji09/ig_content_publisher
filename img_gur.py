@@ -1,5 +1,6 @@
 #@auto-fold regex \.\
-import requests as r,os, json,base64,python_helper as ph
+import requests as r,os, json,base64
+from python_helpers import python_helper as ph
 creds = json.load(open(ph.root_fp+'/creds/creds.json')).get('img_gur')
 baseurl = 'https://api.imgur.com/3/'
 headers = {'Authorization': 'Client-ID {}'.format(creds.get('img_ur_client_id'))}
