@@ -1,4 +1,5 @@
 import instagram as ig
+import  IG-content-publisher
 # token = get_token('uk_travel_redlist')
 # token = get_token('everyday_joker')
 token = ig.get_token('top_10_billionaires')
