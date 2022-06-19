@@ -15,7 +15,7 @@ def create_img(img_path='',size=(1000,1000), colour= random_colour()):
         if img_path.endswith('jpg') or img_path.endswith('png'):
             img = Image.open(ph.root_fp+img_path)
         else:
-            img = Image.open(os.path.join(ph.root_fp+'IG-content-publisher/backgrounds/'+random.choice(os.listdir(ph.root_fp+'IG-content-publisher/backgrounds/'))))
+            img = Image.open(os.path.join(ph.root_fp+'ig_content_publisher/imgs/'+random.choice(os.listdir(ph.root_fp+'ig_content_publisher/imgs/'))))
         if size:
             img = img.resize(size, Image.ANTIALIAS)
     else:
@@ -59,8 +59,7 @@ def add_text(img, sentence, font_size=15, font_name=''):
     draw = ImageDraw.Draw(img)
     img_w,img_h = img.size
     font_name = 'Roboto-Bold' if not font_name else font_name
-    # font = ImageFont.truetype(os.path.abspath(os.getcwd())+'\\font_list\\{0}.ttf'.format(font_name),size=font_size)
-    font = ImageFont.truetype(ph.root_fp+'IG-content-publisher/font_list/{0}.ttf'.format(font_name),size=font_size)
+    font = ImageFont.truetype(ph.root_fp+'ig_content_publisher/font_list/{0}.ttf'.format(font_name),size=font_size)
     text_width, text_height = draw.textsize(wrap_text(sentence), font)
     position = ((img_w-text_width)/2, (img_h-text_height) / 2)
     draw.multiline_text(position, wrap_text(sentence), fill=(255,255,255), font=font)
@@ -68,10 +67,11 @@ def add_text(img, sentence, font_size=15, font_name=''):
 
 def save_upload_img(img, file_name, file_type='png',upload='Y'):
     """Save the final image with the text and define size and files type"""
-    img.save(ph.root_fp+'working_files/'+file_name+'.'+file_type,quality=100)
-    print("Saved img {0}.{1} at {2}".format(file_name,file_type,ph.root_fp+'working_files/'))
+    file_path = ph.root_fp+'working_files/'+file_name+'.'+file_type
+    img.save(file_path,quality=100)
+    print("Saved img {0}".format(file_path))
     if upload =='Y':
-        con  = img_gur.upload_path(ph.root_fp+'working_files/'+'joke'+'.'+file_type)
+        con  = img_gur.upload_path(file_path)
     return con['link']
 
 def upload_img(sentence,file_name,font_size=15,font_name='',file_type='png',img_path='',size=(1000,1000),colour=random_colour(),upload='Y'):
