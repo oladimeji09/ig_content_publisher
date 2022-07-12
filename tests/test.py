@@ -3,7 +3,7 @@ from python_helpers import python_helper as ph
 sys.path.insert(0,ph.root_fp+'ig_content_publisher/publisher')
 import instagram as ig, txt_to_img as tt,json
 
-token = ig.get_token('forbes_tracker')
+token = ig.get_token('le_bad_joker')
 ig_ig = ig.get_ig_acc(token.get('id')).get('id')
 ig.get_post_quota(ig_ig)
 

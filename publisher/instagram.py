@@ -214,7 +214,7 @@ def follow_and_comment(username,password,tag_list,comment,num_media,comment_fp=c
     login(username, password)
     medias = get_hashtag_medias_top(tag_list,num_media) # get media list using the public domain
     for user in medias:
-        # comment_on_media([user],  comment,comment_fp= comment_log)
+        comment_on_media([user],  comment,comment_fp= comment_log)
         if follow == 'Y':
             un_follow_user(user.dict().get('user').get('pk'))
             print('Followed user: '+ user.dict().get('user').get('username'))
