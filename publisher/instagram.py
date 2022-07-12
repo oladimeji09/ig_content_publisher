@@ -10,6 +10,8 @@ baseurl = 'https://graph.facebook.com/v11.0/'
 ig_users = json.load(open(ph.root_fp+'/creds/creds.json')).get('ig_users')
 ig_creds = json.load(open(ph.root_fp+'/creds/creds.json')).get('instagram')
 user_token = open(ph.root_fp+"/creds/ig_access_token.txt", "r").read()
+comment_log =ph.root_fp+'/ig_content_publisher/tests/comments_log.json'
+delete_comment=ph.root_fp+'/ig_content_publisher/tests/delete_comment.json'
 
 def generate_long_token(app_id,app_secret,user_token):
     """Use this to generate Long-Lived User Access Tokens"""
@@ -92,11 +94,6 @@ def get_post_quota(ig_id):
     """Return quota usage for a username"""
     resp = r.get(baseurl+'{}/content_publishing_limit?fields=quota_usage,config&access_token={}'.format(ig_id,page_access_token))
     return resp.json()
-# creds = ig_users.get('le_bad_joker')
-# token = get_token('le_bad_joker')
-# ig_id = get_ig_acc(token.get('id')).get('id')
-# get_post_quota(ig_id)
-# All code the line below uses the instagrapi module
 
 #todo:change this to you don't have to log in everyime
 def login(username:str, password:str):
@@ -140,7 +137,7 @@ def get_user_media(username_list:list, N=5):
                 continue
         return media_list
 
-def comment_on_media(media_list:list,comment:str):
+def comment_on_media(media_list:list,comment:str, comment_fp=comment_log):
     """Comment on media and like the comment & post"""
     if type(media_list) is not list:
         raise ValueError("media_list must be a list")
@@ -149,12 +146,12 @@ def comment_on_media(media_list:list,comment:str):
             time.sleep(rd.randint(0, 200))
             try:
                 media_id = dict(media_id)
-                with open('comment_log.json','r') as fp: #todo: find a way to make this file relative
+                with open(comment_fp,'r') as fp: #todo: find a way to make this file relative
                     if media_id.get('code') not in fp.read():
                         cl.media_like(media_id.get('pk'))
                         comment_id = dict(cl.media_comment(media_id.get('pk'), comment))
                         like_comment = cl.comment_like(comment_id.get('pk'))
-                        with open('comment_log.json','a+') as fp:
+                        with open(comment_fp,'a+') as fp:
                             json.dump({"commented_by_username": cl.username,"commented_by_id": cl.user_id,
                             "media_slug" : "www.instagram.com/p/"+media_id.get('code'),
                             "media_id":media_id.get('pk'), "comment_id": comment_id.get('pk'),
@@ -169,12 +166,12 @@ def comment_on_media(media_list:list,comment:str):
                 print('Error trying for {} '.format("www.instagram.com/p/"+dict(media_id).get('code')))
                 continue
 
-def delete_comment(media_id:str, media_comment_id:int):
+def delete_comment(media_id:str, media_comment_id:int, delete_comment_fp = delete_comment):
     """Delete comment on media"""
     info = dict(cl.media_info(media_id))
     cl.comment_bulk_delete(media_id, [media_comment_id])
     time.sleep(rd.randint(0, 200))
-    with open('deleted_comment.json','a+') as ft: # write the deleted line to file
+    with open(delete_comment_fp,'a+') as ft: # write the deleted line to file
         json.dump({
             "media_slug" : "www.instagram.com/p/"+info.get('code'),
             "media_id":media_id, "media_comment_id": media_comment_id,
@@ -212,16 +209,13 @@ def user_info_by_urs(username:str):
     time.sleep(rd.randint(0, 200))
     return cl.user_info_by_username(username)
 
-def follow_and_comment(username:str,password:str,tag_list:list,comment:str,num_media:int,follow = 'Y'):
+def follow_and_comment(username,password,tag_list,comment,num_media,comment_fp=comment_log,follow = 'Y'):
     """Follow accounts with media in hashtags and write comment"""
-    if type(tag_list) is not list:
-        raise ValueError("tag_list must be a list")
-    else:
-        login(username, password)
-        medias = get_hashtag_medias_top(tag_list,num_media)
-        for user in medias:
-            comment_on_media([user],  comment)
-            if follow == 'Y':
-                un_follow_user(user.dict().get('user').get('pk'))
-                print('Followed user: '+ user.dict().get('user').get('username'))
+    login(username, password)
+    medias = get_hashtag_medias_top(tag_list,num_media) # get media list using the public domain
+    for user in medias:
+        # comment_on_media([user],  comment,comment_fp= comment_log)
+        if follow == 'Y':
+            un_follow_user(user.dict().get('user').get('pk'))
+            print('Followed user: '+ user.dict().get('user').get('username'))
         logout()
